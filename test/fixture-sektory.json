@@ -1,0 +1,340 @@
+[
+ {
+  "name": "10.04.2026",
+  "rows": [
+   {
+    "name": "Jan Kowalski",
+    "stand": 3.0,
+    "sector": "A",
+    "weight": 4.25
+   },
+   {
+    "name": "Piotr Nowak",
+    "stand": 7.0,
+    "sector": "A",
+    "weight": 2.8
+   },
+   {
+    "name": "Marek Wiśniewski",
+    "stand": 1.0,
+    "sector": "A",
+    "weight": 5.12
+   },
+   {
+    "name": "Tomasz Wójcik",
+    "stand": 9.0,
+    "sector": "A",
+    "weight": 0.0
+   },
+   {
+    "name": "Adam Kowalczyk",
+    "stand": 5.0,
+    "sector": "A",
+    "weight": 3.67
+   },
+   {
+    "name": "Łukasz Kamiński",
+    "stand": 12.0,
+    "sector": "B",
+    "weight": 6.43
+   },
+   {
+    "name": "Michał Lewandowski",
+    "stand": 18.0,
+    "sector": "B",
+    "weight": 4.91
+   },
+   {
+    "name": "Krzysztof Zieliński",
+    "stand": 14.0,
+    "sector": "B",
+    "weight": 4.93
+   },
+   {
+    "name": "Bartosz Szymański",
+    "stand": 16.0,
+    "sector": "B",
+    "weight": 2.34
+   },
+   {
+    "name": "Grzegorz Dąbrowski",
+    "stand": 11.0,
+    "sector": "B",
+    "weight": 5.78
+   },
+   {
+    "name": "Rafał Krawczyk",
+    "stand": 22.0,
+    "sector": "C",
+    "weight": 3.15
+   },
+   {
+    "name": "Damian Piotrowiak",
+    "stand": 28.0,
+    "sector": "C",
+    "weight": 7.2
+   },
+   {
+    "name": "Andrzej Nowicki",
+    "stand": 24.0,
+    "sector": "C",
+    "weight": 1.98
+   },
+   {
+    "name": "Jakub Wieczorek",
+    "stand": 21.0,
+    "sector": "C",
+    "weight": 4.56
+   },
+   {
+    "name": "Sławomir Grabowski",
+    "stand": 26.0,
+    "sector": "C",
+    "weight": 4.56
+   }
+  ]
+ },
+ {
+  "name": "12.04.2026",
+  "rows": [
+   {
+    "name": "Jan Kowalski",
+    "stand": 8.0,
+    "sector": "A",
+    "weight": 3.1
+   },
+   {
+    "name": "Marek Wiśniewski",
+    "stand": 2.0,
+    "sector": "A",
+    "weight": 6.85
+   },
+   {
+    "name": "Adam Kowalczyk",
+    "stand": 6.0,
+    "sector": "A",
+    "weight": 2.43
+   },
+   {
+    "name": "Łukasz Kamiński",
+    "stand": 19.0,
+    "sector": "B",
+    "weight": 3.99
+   },
+   {
+    "name": "Michał Lewandowski",
+    "stand": 13.0,
+    "sector": "B",
+    "weight": 5.21
+   },
+   {
+    "name": "Grzegorz Dąbrowski",
+    "stand": 17.0,
+    "sector": "B",
+    "weight": 5.21
+   },
+   {
+    "name": "Bartosz Szymański",
+    "stand": 11.0,
+    "sector": "B",
+    "weight": 1.75
+   },
+   {
+    "name": "Damian Piotrowiak",
+    "stand": 23.0,
+    "sector": "C",
+    "weight": 4.1
+   },
+   {
+    "name": "Jakub Wieczorek",
+    "stand": 29.0,
+    "sector": "C",
+    "weight": 6.67
+   },
+   {
+    "name": "Sławomir Grabowski",
+    "stand": 25.0,
+    "sector": "C",
+    "weight": 3.88
+   },
+   {
+    "name": "Andrzej Nowicki",
+    "stand": 21.0,
+    "sector": "C",
+    "weight": 2.25
+   },
+   {
+    "name": "Rafał Krawczyk",
+    "stand": 27.0,
+    "sector": "C",
+    "weight": 5.5
+   }
+  ]
+ },
+ {
+  "name": "14.04.2026",
+  "rows": [
+   {
+    "name": "Jan Kowalski",
+    "stand": 4.0,
+    "sector": "A",
+    "weight": 5.6
+   },
+   {
+    "name": "Piotr Nowak",
+    "stand": 10.0,
+    "sector": "A",
+    "weight": 4.32
+   },
+   {
+    "name": "Tomasz Wójcik",
+    "stand": 6.0,
+    "sector": "A",
+    "weight": 3.87
+   },
+   {
+    "name": "Adam Kowalczyk",
+    "stand": 2.0,
+    "sector": "A",
+    "weight": 6.91
+   },
+   {
+    "name": "Krzysztof Zieliński",
+    "stand": 15.0,
+    "sector": "B",
+    "weight": 7.34
+   },
+   {
+    "name": "Bartosz Szymański",
+    "stand": 19.0,
+    "sector": "B",
+    "weight": 5.08
+   },
+   {
+    "name": "Łukasz Kamiński",
+    "stand": 13.0,
+    "sector": "B",
+    "weight": 4.45
+   },
+   {
+    "name": "Grzegorz Dąbrowski",
+    "stand": 17.0,
+    "sector": "B",
+    "weight": 2.11
+   },
+   {
+    "name": "Michał Lewandowski",
+    "stand": 24.0,
+    "sector": "C",
+    "weight": 3.66
+   },
+   {
+    "name": "Rafał Krawczyk",
+    "stand": 22.0,
+    "sector": "C",
+    "weight": 6.12
+   },
+   {
+    "name": "Sławomir Grabowski",
+    "stand": 28.0,
+    "sector": "C",
+    "weight": 4.87
+   },
+   {
+    "name": "Andrzej Nowicki",
+    "stand": 26.0,
+    "sector": "C",
+    "weight": 5.43
+   },
+   {
+    "name": "Damian Piotrowiak",
+    "stand": 30.0,
+    "sector": "C",
+    "weight": 7.89
+   }
+  ]
+ },
+ {
+  "name": "16.04.2026",
+  "rows": [
+   {
+    "name": "Piotr Nowak",
+    "stand": 5.0,
+    "sector": "A",
+    "weight": 6.1
+   },
+   {
+    "name": "Marek Wiśniewski",
+    "stand": 9.0,
+    "sector": "A",
+    "weight": 3.45
+   },
+   {
+    "name": "Tomasz Wójcik",
+    "stand": 3.0,
+    "sector": "A",
+    "weight": 5.78
+   },
+   {
+    "name": "Krzysztof Zieliński",
+    "stand": 7.0,
+    "sector": "A",
+    "weight": 4.23
+   },
+   {
+    "name": "Jan Kowalski",
+    "stand": 14.0,
+    "sector": "B",
+    "weight": 3.99
+   },
+   {
+    "name": "Łukasz Kamiński",
+    "stand": 18.0,
+    "sector": "B",
+    "weight": 6.54
+   },
+   {
+    "name": "Michał Lewandowski",
+    "stand": 12.0,
+    "sector": "B",
+    "weight": 2.87
+   },
+   {
+    "name": "Bartosz Szymański",
+    "stand": 16.0,
+    "sector": "B",
+    "weight": 5.12
+   },
+   {
+    "name": "Adam Kowalczyk",
+    "stand": 25.0,
+    "sector": "C",
+    "weight": 4.78
+   },
+   {
+    "name": "Jakub Wieczorek",
+    "stand": 21.0,
+    "sector": "C",
+    "weight": 7.45
+   },
+   {
+    "name": "Rafał Krawczyk",
+    "stand": 29.0,
+    "sector": "C",
+    "weight": 3.23
+   },
+   {
+    "name": "Grzegorz Dąbrowski",
+    "stand": 23.0,
+    "sector": "C",
+    "weight": 5.91
+   },
+   {
+    "name": "Sławomir Grabowski",
+    "stand": 27.0,
+    "sector": "C",
+    "weight": 2.64
+   }
+  ]
+ }
+]
