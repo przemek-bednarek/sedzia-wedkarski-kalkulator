@@ -4,7 +4,7 @@ Aplikacja dla sędziego: wgrywasz plik Excel (każda tura w osobnym arkuszu), do
 Wszystko liczy się w przeglądarce – bez serwera, bez logowania, bez zapisu danych.
 
 ## Reguły (wersja bieżąca)
-- Sektor czytany z pliku, nigdy liczony ze stanowiska.
+- Sektor czytany z pliku, nigdy liczony ze stanowiska. Brak sztywnego limitu osób w sektorze.
 - Miejsce w sektorze = punkty (mniej = lepiej). Remis wagi = średnia pozycji (4,5,6 → 5,0 pkt każdy).
 - Zero ryb: zawodnik jest klasyfikowany na końcu sektora; kilku zer dzieli średnią pozycji (sektor 10 os., 2 zera → po 9,5 pkt).
 - Ranking tury: punkty rosnąco, remis rozstrzyga waga, pełny remis → to samo miejsce (1-2-2-4).
@@ -12,7 +12,7 @@ Wszystko liczy się w przeglądarce – bez serwera, bez logowania, bez zapisu d
 - Nieobecność = brak w arkuszu (brak punktów za turę). Grand Prix – poza zakresem MVP.
 
 ## Dokumentacja
-- `docs/PRD_zawody_sektorowe_v3.0.docx` – aktualny PRD (v3.0).
+- `docs/PRD_zawody_sektorowe_v3.1.docx` – aktualny PRD (v3.1).
 
 ## Struktura
 - `src/logic.js` – czysta logika (bez UI); `src/parse.js` – odczyt arkuszy; `src/app.js` – interfejs.

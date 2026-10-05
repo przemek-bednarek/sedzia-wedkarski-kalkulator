@@ -91,3 +91,10 @@ test('parseSheet: nagłówki, przecinek dziesiętny, ostrzeżenia, jednostka', (
   assert.equal(toGrams(4.25, 'kg'), 4250);
   assert.equal(parseSheet('x', [['a', 'b']]).error.startsWith('brak kolumn'), true);
 });
+
+test('sektor 12 osób (brak sztywnego limitu), 3 zera -> po 11 pkt', () => {
+  const rows = Array.from({ length: 12 }, (_, i) => ({ name: 'Z' + i, sector: 'A', weight: i < 9 ? 20 - i : 0 }));
+  const res = computeRound(rows);
+  ['Z9', 'Z10', 'Z11'].forEach((n) => assert.equal(by(res, n).points, 11));
+  assert.equal(by(res, 'Z8').points, 9);
+});
