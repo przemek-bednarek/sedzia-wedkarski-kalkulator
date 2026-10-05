@@ -1,5 +1,6 @@
 // Czysta logika rankingu sektorowego. Bez UI, bez zależności – działa w przeglądarce i w Node.
-// Zasady: ranking ułamkowy w sektorze; zero ryb = ostatnie miejsca w sektorze (średnia pozycji zer);
+// Zasady: ranking ułamkowy w sektorze; zero ryb: ex aequo (2+ zer) = średnia ostatnich miejsc sektora,
+// jedno zero = punkty ostatniego miejsca najliczniejszego sektora tury;
 // 1-2-2-4 w rankingach tury i końcowym.
 
 const wKey = (w) => Math.round(Number(w) * 1000); // usuwa szum float, NIE zaokrągla do wyświetlania
@@ -48,14 +49,21 @@ export function computeRound(rows) {
   const nk = []; // zarezerwowane na przyszłość (np. nieobecność) – dziś nikt nie jest NK
   const ok = clean;
 
-  // 1) Miejsce w sektorze (= punkty), ułamkowo przy remisie wagi. NK nie bierze udziału w numeracji.
+  // 1) Miejsce w sektorze (= punkty), ułamkowo przy remisie wagi.
+  //    Zero ryb:
+  //    - 2 lub więcej zer w sektorze (ex aequo): dzielą średnią ostatnich miejsc własnego sektora (reguła nadrzędna),
+  //    - dokładnie 1 zero w sektorze: dostaje tyle punktów, ile ostatnie miejsce w NAJLICZNIEJSZYM sektorze tury.
   const bySector = new Map();
   ok.forEach((r) => (bySector.get(r.sector) ?? bySector.set(r.sector, []).get(r.sector)).push(r));
+  const maxSectorSize = Math.max(0, ...[...bySector.values()].map((l) => l.length));
   const scored = [];
   for (const [, list] of bySector) {
-    list.sort((a, b) => wKey(b.weight) - wKey(a.weight));
-    const places = fractionalPlaces(list, (r) => wKey(r.weight));
-    list.forEach((r, i) => scored.push({ ...r, points: places[i] }));
+    const fish = list.filter((r) => wKey(r.weight) > 0).sort((a, b) => wKey(b.weight) - wKey(a.weight));
+    const zeros = list.filter((r) => wKey(r.weight) <= 0);
+    const places = fractionalPlaces(fish, (r) => wKey(r.weight));
+    fish.forEach((r, i) => scored.push({ ...r, points: places[i] }));
+    const zeroPts = zeros.length === 1 ? maxSectorSize : (fish.length + 1 + list.length) / 2;
+    zeros.forEach((r) => scored.push({ ...r, points: zeroPts }));
   }
 
   // 2) Ranking tury: punkty rosnąco, remis -> wyższa waga; pełny remis -> to samo miejsce (1-2-2-4).

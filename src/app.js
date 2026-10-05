@@ -49,7 +49,7 @@ function render() {
       <td class="num hide-s">${r.validRounds}</td>
       <td>${r.best.map((b) => `<span class="tag">${esc(b.round)}: ${fmtPts(b.points)} pkt</span>`).join('')}</td>
       <td class="hide-s">${r.best.map((b) => `<span class="tag">${fmtG(toGrams(b.weight, 'kg'))}</span>`).join('')}</td></tr>`).join('');
-    const out = fin.notQualified.length ? `<div class="warn">Poza klasyfikacją (mniej niż 2 tury): ${fin.notQualified.map((n) => esc(n.name)).join(', ')}.</div>` : '';
+    const out = fin.notQualified.length ? `<details class="warn"><summary>Poza klasyfikacją (mniej niż 2 tury): ${fin.notQualified.length} os.</summary>${fin.notQualified.map((n) => esc(n.name)).join(', ')}.</details>` : '';
     body = `${out}<div class="card"><table><thead><tr><th class="num">#</th><th>Zawodnik</th><th class="num">Punkty z dwóch najlepszych tur</th><th class="num hide-s">Tury</th><th>Najlepsze 2 tury</th><th class="hide-s">Najlepsze 2 tury (waga)</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   } else {
     const rd = computeRound(rounds.find((r) => r.name === view).rows);
