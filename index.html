@@ -52,6 +52,9 @@
   .num{text-align:center}.pts{color:var(--teal);font-weight:700;font-size:21px}
   .medal{width:32px;height:32px;border-radius:50%;display:inline-grid;place-items:center;font-weight:600;font-size:14px;border:2px solid transparent;color:var(--ink)}
   .p1,.p2,.p3{background:#fff;font-weight:700}
+  .place{display:inline-flex;align-items:center;gap:6px}
+  .cup,.cupslot{width:20px;height:20px;flex:none}
+  .c1{--cf:#c18d20;--cs:#805b00}.c2{--cf:#b9c8d1;--cs:#425c6a}.c3{--cf:#c98a62;--cs:#865132}
   .p1{border-color:var(--g1);color:var(--g1)}.p2{border-color:var(--s2);color:var(--s2)}.p3{border-color:var(--b3);color:var(--b3)}
   .tag{display:inline-block;background:var(--soft);color:var(--soft-ink);border-radius:7px;padding:3px 9px;margin:2px 6px 2px 0;font-size:13px;font-weight:500}
   td.hide-s .tag{background:var(--surface);border:1px solid var(--line);color:var(--ink)}
@@ -66,9 +69,11 @@
   .btn.prn{background:var(--surface);color:var(--ink);border-color:var(--edge)}
   .btn:hover{filter:brightness(.94)}
   .pubhint{color:var(--muted);font-size:13px;text-align:right;margin:0 0 14px}
+  .status{color:var(--muted);font-size:13px;text-align:right;margin:-8px 0 12px}.status:empty{display:none}
   .hint{color:var(--muted);font-size:13px;margin-top:14px}
   .phead,.sig{display:none}
   @media (max-width:720px){
+    .status{text-align:left}
     header{padding:14px 16px;gap:12px}h1{font-size:22px}.logo{width:48px}
     main{padding:16px 12px 48px}
     td,th{padding:9px 8px}td{font-size:14px}.pts{font-size:19px}.hide-s{display:none}td.num{white-space:nowrap}.tag{white-space:nowrap}
@@ -76,7 +81,7 @@
   }
   @page{size:A4 landscape;margin:12mm}
   @media print{
-    header,.drop,.chips,.tabs,.bar,.pubhint,.warn,.hint{display:none!important}
+    header,.drop,.chips,.tabs,.bar,.pubhint,.status,.warn,.hint{display:none!important}
     main{padding:0;max-width:none}
     .phead{display:flex;align-items:center;gap:14px;margin:0 0 10px}
     .plogo{width:56px;height:auto;aspect-ratio:56.4/37.21;color:var(--logo);flex:none}
@@ -109,12 +114,13 @@
     body:not([data-export="pub"]) .medal{border-color:transparent!important;font-weight:400}
     body:not([data-export="pub"]) .p1,body:not([data-export="pub"]) .p2,body:not([data-export="pub"]) .p3{font-weight:700}
     body:not([data-export="pub"]) .tag{border:0!important}
+    body:not([data-export="pub"]) .cup{--cf:none!important;--cs:#000!important}
     body:not([data-export="pub"]) .pts{font-weight:700}
   }
 </style>
 </head>
 <body>
-<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><symbol id="logo-mark" viewBox="3.8 5.49 56.4 37.21"><path fill="currentColor" d="M29.5 9.8C25 6.2 14 4.6 7.5 6.5C5.17 7.17 4 8.67 4 11L4 36.5C4 38.83 5.17 39.67 7.5 39C14 37.2 25 38.6 29.5 42.5L29.5 27.89C27.56 27.02 25.84 26.1 24.2 25.4L13.5 30.8C17.5 26.27 17.5 21.73 13.5 17.2L24.2 22.6C25.84 21.9 27.56 20.98 29.5 20.11L29.5 9.8ZM34.5 9.8C39 6.2 50 4.6 56.5 6.5C58.83 7.17 60 8.67 60 11L60 36.5C60 38.83 58.83 39.67 56.5 39C50 37.2 39 38.6 34.5 42.5L34 29.6C34 29.6 34 29.6 34 29.6C43.5 32.4 52.6 28.4 53 24C52.6 19.6 43.5 15.6 34 18.4C34 18.4 34 18.4 34 18.4L34.5 9.8Z"/></symbol></svg>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><symbol id="logo-mark" viewBox="3.8 5.49 56.4 37.21"><path fill="currentColor" d="M29.5 9.8C25 6.2 14 4.6 7.5 6.5C5.17 7.17 4 8.67 4 11L4 36.5C4 38.83 5.17 39.67 7.5 39C14 37.2 25 38.6 29.5 42.5L29.5 27.89C27.56 27.02 25.84 26.1 24.2 25.4L13.5 30.8C17.5 26.27 17.5 21.73 13.5 17.2L24.2 22.6C25.84 21.9 27.56 20.98 29.5 20.11L29.5 9.8ZM34.5 9.8C39 6.2 50 4.6 56.5 6.5C58.83 7.17 60 8.67 60 11L60 36.5C60 38.83 58.83 39.67 56.5 39C50 37.2 39 38.6 34.5 42.5L34 29.6C34 29.6 34 29.6 34 29.6C43.5 32.4 52.6 28.4 53 24C52.6 19.6 43.5 15.6 34 18.4C34 18.4 34 18.4 34 18.4L34.5 9.8Z"/></symbol><symbol id="cup" viewBox="0 0 24 24"><g style="stroke:var(--cs)" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-1.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98 1.97 1.21C16.15 18.75 17 20.24 17 22"/><path class="cup-body" style="fill:var(--cf)" d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></g></symbol></svg>
 <header>
   <svg class="logo" viewBox="3.8 5.49 56.4 37.21" role="img" aria-label="Dziennik Wędkarza"><use href="#logo-mark"/></svg>
   <div><h1>Klasyfikacja Zawodów Wędkarskich</h1><p>Ranking na podstawie 2 najlepszych tur · system sektorowy</p></div>
@@ -129,6 +135,6 @@
   <p class="hint">Dane są liczone wyłącznie w Twojej przeglądarce – plik nie jest nigdzie wysyłany.</p>
 </main>
 <script src="vendor/xlsx.full.min.js"></script>
-<script type="module" src="src/app.js"></script>
+<script type="module" src="src/app.js?v=3"></script>
 </body>
 </html>

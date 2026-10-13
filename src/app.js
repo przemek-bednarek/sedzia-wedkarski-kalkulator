@@ -1,5 +1,6 @@
-import { computeRound, computeFinal } from './logic.js';
-import { parseSheet, detectUnit, toGrams } from './parse.js';
+// Numer wersji w adresach (?v=) omija cache przeglądarki po wdrożeniu; zwiększ go razem z index.html przy zmianie plików w src/.
+import { computeRound, computeFinal } from './logic.js?v=3';
+import { parseSheet, detectUnit, toGrams } from './parse.js?v=3';
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -31,6 +32,56 @@ async function load(file) {
   }
 }
 
+// Jeden model tabeli zasila widok HTML i generator PDF (src/pdf.js), żeby oba pokazywały te same dane.
+// Komórki: place -> liczba, tags -> tablica tekstów, pozostałe -> tekst.
+function buildModel(view, rounds, fin) {
+  if (view === 'final') {
+    return {
+      cols: [
+        { h: '#', th: 'num', kind: 'place', w: 16 },
+        { h: 'Zawodnik', th: '', kind: 'name', w: 62 },
+        { h: 'Punkty z dwóch najlepszych tur', th: 'num', kind: 'pts', w: 34 },
+        { h: 'Tury', th: 'num hide-s', kind: 'text', w: 14 },
+        { h: 'Najlepsze 2 tury', th: '', kind: 'tags', w: 84 },
+        { h: 'Najlepsze 2 tury (waga)', th: 'hide-s', kind: 'tags', tag: 'weight', w: 63 },
+      ],
+      rows: fin.table.map((r) => ({
+        place: r.place,
+        cells: [r.place, r.name, fmtPts(r.total), String(r.validRounds), r.best.map((b) => `${b.round}: ${fmtPts(b.points)} pkt`), r.best.map((b) => fmtG(toGrams(b.weight, 'kg')))],
+      })),
+    };
+  }
+  const rd = computeRound(rounds.find((r) => r.name === view).rows);
+  return {
+    cols: [
+      { h: 'Lp.', th: 'num', kind: 'index', w: 16 },
+      { h: 'Nazwisko Imię', th: '', kind: 'name', w: 90 },
+      { h: 'Sek.', th: 'num', kind: 'text', w: 22 },
+      { h: 'Stan.', th: 'num', kind: 'text', w: 22 },
+      { h: 'Waga', th: 'num', kind: 'text', w: 38 },
+      { h: 'Pkt', th: 'num', kind: 'pts', w: 30 },
+      { h: 'Miejsce', th: 'num', kind: 'place', w: 55 },
+    ],
+    rows: rd.rows.map((r, i) => ({
+      place: r.place,
+      cells: [String(i + 1), r.name, String(r.sector), String(r.stand ?? ''), fmtG(toGrams(r.weight, 'kg')), fmtPts(r.points), r.place],
+    })),
+  };
+}
+
+const cup = (place) => (place >= 1 && place <= 3 ? `<svg class="cup c${place}" viewBox="0 0 24 24" aria-hidden="true"><use href="#cup"/></svg>` : '<span class="cupslot"></span>');
+function cellHtml(col, v) {
+  switch (col.kind) {
+    case 'place': return `<td class="num"><span class="place">${cup(v)}<span class="medal${medalCls(v)}">${v}</span></span></td>`;
+    case 'name': return `<td><b>${esc(v)}</b></td>`;
+    case 'pts': return `<td class="num pts">${esc(v)}</td>`;
+    case 'index': return `<td class="num muted">${esc(v)}</td>`;
+    case 'tags': return `<td${col.th ? ` class="${col.th}"` : ''}>${v.map((t) => `<span class="tag">${esc(t)}</span>`).join('')}</td>`;
+    default: return `<td class="${col.th}">${esc(v)}</td>`;
+  }
+}
+const tableHtml = ({ cols, rows }) => `<div class="card"><table><thead><tr>${cols.map((c) => `<th${c.th ? ` class="${c.th}"` : ''}>${esc(c.h)}</th>`).join('')}</tr></thead><tbody>${rows.map((r) => `<tr${rowCls(r.place)}>${r.cells.map((v, i) => cellHtml(cols[i], v)).join('')}</tr>`).join('')}</tbody></table></div>`;
+
 function render() {
   document.body.classList.add('compact');
   const { sheets, good, unit, view } = state;
@@ -42,22 +93,9 @@ function render() {
   const warns = [...sheets.filter((s) => s.error).map((s) => `Arkusz „${s.name}” pominięty – ${s.error}`), ...good.flatMap((s) => s.warnings)];
   const tabs = [['final', 'Ranking końcowy'], ...good.map((s) => [s.name, s.name])];
 
-  let body;
-  if (view === 'final') {
-    const rows = fin.table.map((r) => `<tr${rowCls(r.place)}>
-      <td class="num"><span class="medal${medalCls(r.place)}">${r.place}</span></td>
-      <td><b>${esc(r.name)}</b></td>
-      <td class="num pts">${fmtPts(r.total)}</td>
-      <td class="num hide-s">${r.validRounds}</td>
-      <td>${r.best.map((b) => `<span class="tag">${esc(b.round)}: ${fmtPts(b.points)} pkt</span>`).join('')}</td>
-      <td class="hide-s">${r.best.map((b) => `<span class="tag">${fmtG(toGrams(b.weight, 'kg'))}</span>`).join('')}</td></tr>`).join('');
-    const out = fin.notQualified.length ? `<details class="warn"><summary>Poza klasyfikacją (mniej niż 2 tury): ${fin.notQualified.length} os.</summary>${fin.notQualified.map((n) => esc(n.name)).join(', ')}.</details>` : '';
-    body = `${out}<div class="card"><table><thead><tr><th class="num">#</th><th>Zawodnik</th><th class="num">Punkty z dwóch najlepszych tur</th><th class="num hide-s">Tury</th><th>Najlepsze 2 tury</th><th class="hide-s">Najlepsze 2 tury (waga)</th></tr></thead><tbody>${rows}</tbody></table></div>`;
-  } else {
-    const rd = computeRound(rounds.find((r) => r.name === view).rows);
-    const rows = rd.rows.map((r, i) => `<tr${rowCls(r.place)}><td class="num muted">${i + 1}</td><td><b>${esc(r.name)}</b></td><td class="num">${esc(r.sector)}</td><td class="num">${esc(r.stand ?? '')}</td><td class="num">${fmtG(toGrams(r.weight, 'kg'))}</td><td class="num pts">${fmtPts(r.points)}</td><td class="num"><span class="medal${medalCls(r.place)}">${r.place}</span></td></tr>`).join('');
-    body = `<div class="card"><table><thead><tr><th class="num">Lp.</th><th>Nazwisko Imię</th><th class="num">Sek.</th><th class="num">Stan.</th><th class="num">Waga</th><th class="num">Pkt</th><th class="num">Miejsce</th></tr></thead><tbody>${rows}</tbody></table></div>`;
-  }
+  state.model = buildModel(view, rounds, fin);
+  const out = view === 'final' && fin.notQualified.length ? `<details class="warn"><summary>Poza klasyfikacją (mniej niż 2 tury): ${fin.notQualified.length} os.</summary>${fin.notQualified.map((n) => esc(n.name)).join(', ')}.</details>` : '';
+  const body = out + tableHtml(state.model);
 
   $('#out').innerHTML = `
     <div class="chips">
@@ -69,7 +107,8 @@ function render() {
     ${warns.length ? `<div class="warn"><b>Do sprawdzenia:</b><ul>${warns.map((w) => `<li>${esc(w)}</li>`).join('')}</ul></div>` : ''}
     <div class="tabs">${tabs.map(([k, l]) => `<button class="tab ${k === view ? 'on' : ''}" data-k="${esc(k)}"${k === view ? ' aria-current="true"' : ''}>${esc(l)}</button>`).join('')}</div>
     <div class="bar"><input id="title" placeholder="Tytuł do PDF, np. Puchar Okręgu – 12.05 Częstochowa" value="${esc(state.title)}"><button class="btn" id="pdf-pub">PDF do publikacji</button><button class="btn prn" id="pdf-print">PDF do druku</button></div>
-    <p class="pubhint">„PDF do publikacji”: w oknie wydruku zaznacz „Grafika w tle”, aby zachować kolory.</p>
+    <p class="pubhint">Przyciski pobierają plik PDF. Jeśli się nie uda, otworzy się okno wydruku („Zapisz jako PDF”).</p>
+    <p class="status" id="pdf-status" role="status" aria-live="polite"></p>
     <div class="phead"><svg class="plogo" viewBox="3.8 5.49 56.4 37.21" aria-hidden="true"><use href="#logo-mark"/></svg><div class="ptitle" id="ptitle"></div></div>
     ${body}
     <div class="sig">Opracował Bednarek Sławomir</div>`;
@@ -81,19 +120,52 @@ function render() {
   $('#pdf-print').addEventListener('click', () => exportPdf('print'));
 }
 
-// Tytuł dokumentu zależy od wybranego rankingu i pola tytułu; wywoływane też przy zwykłym Ctrl+P.
+// Tytuł dokumentu zależy od wybranego rankingu i pola tytułu (PDF, wydruk, zwykłe Ctrl+P).
+const docTitle = () => state.title || (state.view === 'final' ? 'Ranking końcowy – 2 najlepsze tury' : `Wyniki tury ${state.view}`);
 function fillPrintTitle() {
   const el = $('#ptitle');
   if (!el || !state) return;
-  el.textContent = state.title || (state.view === 'final' ? 'Ranking końcowy – 2 najlepsze tury' : `Wyniki tury ${state.view}`);
+  el.textContent = docTitle();
 }
 
-// Tryb eksportu jest tymczasowy: ustawiany przyciskiem, czyszczony po zamknięciu lub anulowaniu okna wydruku.
-// Bez trybu (Ctrl+P, menu przeglądarki) obowiązuje wariant do druku, bez wypełnień.
-function exportPdf(mode) {
+// jsPDF i font ładują się dopiero przy pierwszym eksporcie, żeby nie obciążać otwarcia strony.
+const loadScript = (src) => new Promise((ok, fail) => {
+  const s = document.createElement('script');
+  s.src = src; s.onload = ok; s.onerror = () => fail(new Error(`nie udało się wczytać ${src}`));
+  document.head.append(s);
+});
+let pdfModule;
+const loadPdf = () => (pdfModule ??= (async () => {
+  if (!window.jspdf) await loadScript('vendor/jspdf.umd.min.js?v=3');
+  return import('./pdf.js?v=3');
+})().catch((e) => { pdfModule = undefined; throw e; }));
+
+const setStatus = (msg) => { const el = $('#pdf-status'); if (el) el.textContent = msg; };
+
+// Pobiera plik PDF. Gdy generowanie się nie powiedzie (np. brak sieci przy pierwszym użyciu),
+// otwiera okno wydruku z tym samym wariantem stylów.
+async function exportPdf(mode) {
+  const btns = [...document.querySelectorAll('#pdf-pub, #pdf-print')];
+  btns.forEach((b) => (b.disabled = true));
+  setStatus('Przygotowuję plik PDF…');
+  try {
+    const { buildPdf } = await loadPdf();
+    const name = await buildPdf({ model: state.model, mode, title: docTitle() });
+    setStatus(`Przygotowano plik: ${name}`);
+  } catch (e) {
+    console.error(e);
+    setStatus(`Nie udało się przygotować pliku PDF. Otwieram okno wydruku – wybierz „Zapisz jako PDF”${mode === 'pub' ? ' i zaznacz „Grafika w tle”' : ''}.`);
+    printFallback(mode);
+  } finally {
+    btns.forEach((b) => (b.disabled = false));
+  }
+}
+
+// Tryb wydruku jest tymczasowy: czyszczony po zamknięciu lub anulowaniu okna. Bez trybu (Ctrl+P) obowiązuje wariant do druku.
+function printFallback(mode) {
   document.body.dataset.export = mode;
   fillPrintTitle();
-  window.print(); // w oknie wydruku wybierz „Zapisz jako PDF”
+  window.print();
 }
 window.addEventListener('beforeprint', fillPrintTitle);
 window.addEventListener('afterprint', () => delete document.body.dataset.export);
