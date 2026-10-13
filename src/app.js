@@ -4,6 +4,8 @@ import { parseSheet, detectUnit, toGrams } from './parse.js';
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const fmtPts = (p) => String(p).replace('.', ',');
+const rowCls = (place) => (place >= 1 && place <= 3 ? ` class="r${place}"` : '');
+const medalCls = (place) => (place >= 1 && place <= 3 ? ` p${place}` : '');
 const fmtG = (g) => Math.round(g).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' g';
 
 let state = null; // { sheets, unit, view, title }
@@ -42,8 +44,8 @@ function render() {
 
   let body;
   if (view === 'final') {
-    const rows = fin.table.map((r) => `<tr>
-      <td class="num"><span class="medal m${r.place}">${r.place}</span></td>
+    const rows = fin.table.map((r) => `<tr${rowCls(r.place)}>
+      <td class="num"><span class="medal${medalCls(r.place)}">${r.place}</span></td>
       <td><b>${esc(r.name)}</b></td>
       <td class="num pts">${fmtPts(r.total)}</td>
       <td class="num hide-s">${r.validRounds}</td>
@@ -53,29 +55,45 @@ function render() {
     body = `${out}<div class="card"><table><thead><tr><th class="num">#</th><th>Zawodnik</th><th class="num">Punkty z dwóch najlepszych tur</th><th class="num hide-s">Tury</th><th>Najlepsze 2 tury</th><th class="hide-s">Najlepsze 2 tury (waga)</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   } else {
     const rd = computeRound(rounds.find((r) => r.name === view).rows);
-    const rows = rd.rows.map((r, i) => `<tr><td class="num muted">${i + 1}</td><td><b>${esc(r.name)}</b></td><td class="num">${esc(r.sector)}</td><td class="num">${esc(r.stand ?? '')}</td><td class="num">${fmtG(toGrams(r.weight, 'kg'))}</td><td class="num pts">${fmtPts(r.points)}</td><td class="num"><span class="medal m${r.place}">${r.place}</span></td></tr>`).join('');
+    const rows = rd.rows.map((r, i) => `<tr${rowCls(r.place)}><td class="num muted">${i + 1}</td><td><b>${esc(r.name)}</b></td><td class="num">${esc(r.sector)}</td><td class="num">${esc(r.stand ?? '')}</td><td class="num">${fmtG(toGrams(r.weight, 'kg'))}</td><td class="num pts">${fmtPts(r.points)}</td><td class="num"><span class="medal${medalCls(r.place)}">${r.place}</span></td></tr>`).join('');
     body = `<div class="card"><table><thead><tr><th class="num">Lp.</th><th>Nazwisko Imię</th><th class="num">Sek.</th><th class="num">Stan.</th><th class="num">Waga</th><th class="num">Pkt</th><th class="num">Miejsce</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   }
 
   $('#out').innerHTML = `
     <div class="chips">
-      <span class="chip b">${players.size} zawodników łącznie</span>
-      <span class="chip b">${good.length} ${good.length === 1 ? 'tura załadowana' : 'tur załadowanych'}</span>
-      <span class="chip">${fin.table.length} w klasyfikacji (min. 2 tury)</span>
-      <span class="chip">wagi w pliku: ${unit}</span>
+      <span class="chip b"><b>${players.size}</b> zawodników łącznie</span>
+      <span class="chip b"><b>${good.length}</b> ${good.length === 1 ? 'tura załadowana' : 'tur załadowanych'}</span>
+      <span class="chip"><b>${fin.table.length}</b> w klasyfikacji (min. 2 tury)</span>
+      <span class="chip">wagi w pliku: <b>${unit}</b></span>
     </div>
     ${warns.length ? `<div class="warn"><b>Do sprawdzenia:</b><ul>${warns.map((w) => `<li>${esc(w)}</li>`).join('')}</ul></div>` : ''}
-    <div class="tabs">${tabs.map(([k, l]) => `<button class="tab ${k === view ? 'on' : ''}" data-k="${esc(k)}">${esc(l)}</button>`).join('')}</div>
-    <div class="bar"><input id="title" placeholder="Tytuł do PDF, np. Puchar Okręgu – 12.05 Częstochowa" value="${esc(state.title)}"><button class="btn" id="pdf">Pobierz PDF</button></div>
-    <div class="ptitle" id="ptitle"></div>
+    <div class="tabs">${tabs.map(([k, l]) => `<button class="tab ${k === view ? 'on' : ''}" data-k="${esc(k)}"${k === view ? ' aria-current="true"' : ''}>${esc(l)}</button>`).join('')}</div>
+    <div class="bar"><input id="title" placeholder="Tytuł do PDF, np. Puchar Okręgu – 12.05 Częstochowa" value="${esc(state.title)}"><button class="btn" id="pdf-pub">PDF do publikacji</button><button class="btn prn" id="pdf-print">PDF do druku</button></div>
+    <p class="pubhint">„PDF do publikacji”: w oknie wydruku zaznacz „Grafika w tle”, aby zachować kolory.</p>
+    <div class="phead"><svg class="plogo" viewBox="3.8 5.49 56.4 37.21" aria-hidden="true"><use href="#logo-mark"/></svg><div class="ptitle" id="ptitle"></div></div>
     ${body}
     <div class="sig">Opracował Bednarek Sławomir</div>`;
 
   document.querySelectorAll('.tab').forEach((b) => b.addEventListener('click', () => { state.view = b.dataset.k; render(); }));
   const t = $('#title');
   t.addEventListener('input', () => (state.title = t.value));
-  $('#pdf').addEventListener('click', () => {
-    $('#ptitle').textContent = state.title || (view === 'final' ? 'Ranking końcowy – 2 najlepsze tury' : `Wyniki tury ${view}`);
-    window.print(); // w oknie wydruku wybierz „Zapisz jako PDF”
-  });
+  $('#pdf-pub').addEventListener('click', () => exportPdf('pub'));
+  $('#pdf-print').addEventListener('click', () => exportPdf('print'));
 }
+
+// Tytuł dokumentu zależy od wybranego rankingu i pola tytułu; wywoływane też przy zwykłym Ctrl+P.
+function fillPrintTitle() {
+  const el = $('#ptitle');
+  if (!el || !state) return;
+  el.textContent = state.title || (state.view === 'final' ? 'Ranking końcowy – 2 najlepsze tury' : `Wyniki tury ${state.view}`);
+}
+
+// Tryb eksportu jest tymczasowy: ustawiany przyciskiem, czyszczony po zamknięciu lub anulowaniu okna wydruku.
+// Bez trybu (Ctrl+P, menu przeglądarki) obowiązuje wariant do druku, bez wypełnień.
+function exportPdf(mode) {
+  document.body.dataset.export = mode;
+  fillPrintTitle();
+  window.print(); // w oknie wydruku wybierz „Zapisz jako PDF”
+}
+window.addEventListener('beforeprint', fillPrintTitle);
+window.addEventListener('afterprint', () => delete document.body.dataset.export);

@@ -2,6 +2,7 @@
 
 Aplikacja dla sędziego: wgrywasz plik Excel (każda tura w osobnym arkuszu), dostajesz ranking tur i ranking końcowy z 2 najlepszych tur, z eksportem do PDF.
 Wszystko liczy się w przeglądarce – bez serwera, bez logowania, bez zapisu danych.
+Eksport: dwa przyciski – „PDF do publikacji” (kolorowy) i „PDF do druku” (bez wypełnień); zwykłe Ctrl+P też daje wariant do druku.
 
 ## Reguły (wersja bieżąca)
 - Sektor czytany z pliku, nigdy liczony ze stanowiska. Brak sztywnego limitu osób w sektorze.
@@ -20,6 +21,7 @@ Wszystko liczy się w przeglądarce – bez serwera, bez logowania, bez zapisu d
 ## Struktura
 - `src/logic.js` – czysta logika (bez UI); `src/parse.js` – odczyt arkuszy; `src/app.js` – interfejs.
 - `test/` – testy (`npm test`, Node 18+), dane testowe w `test/fixture-sektory.json`.
+- `assets/favicon.svg` – znak Dziennika Wędkarza (lokalna kopia, używana jako logo i favicon).
 - `vendor/xlsx.full.min.js` – biblioteka do czytania Excela (SheetJS, wersja z repozytorium npm).
 
 ## Uruchomienie lokalnie

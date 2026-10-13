@@ -3,70 +3,125 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
 <title>Klasyfikacja Zawodów Wędkarskich</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <style>
-  :root{--bg:#f8f9fb;--card:#fff;--ink:#1c2230;--muted:#6b7385;--line:#e3e6ee;--blue:#2f6fd0;--blue-soft:#e7eef9;--gold:#f6b93b;--gold-soft:#fdf1d8;--silver-soft:#eceef2;--bronze-soft:#f6e6da;--warn:#fff6e0;--warn-line:#f0d59a}
+  :root{
+    --bg:hsl(200 30% 96.1%);--surface:#fff;--ink:hsl(196 52% 8.2%);--muted:hsl(199 17% 33.1%);
+    --teal:hsl(188 100% 27.1%);--on-teal:#fff;--soft:hsl(188 64% 88%);--soft-ink:hsl(188 100% 18.6%);
+    --line:hsl(200 26% 86.3%);--edge:hsl(199 17% 52%);--drop-edge:hsl(188 55% 40%);
+    --r:10px;--rs:13px;--logo:#14525a;
+    --g1-bg:#fff6dd;--g1:#805b00;--g1-bar:#c18d20;
+    --s2-bg:#eef3f6;--s2:#425c6a;
+    --b3-bg:#faf0e9;--b3:#865132;
+    --warn:#fff6e0;--warn-line:#f0d59a;--err:#fdecec;--err-line:#e0a3a3;
+    --font:Outfit,system-ui,-apple-system,"Segoe UI",sans-serif
+  }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
-  header{background:var(--card);border-bottom:1px solid var(--line);padding:18px 28px;display:flex;gap:16px;align-items:center}
-  .logo{width:44px;height:44px;border-radius:11px;background:var(--blue);display:grid;place-items:center;flex:none}
-  h1{margin:0;font-size:22px;letter-spacing:-.02em}
-  header p{margin:2px 0 0;color:var(--muted);font-size:15px}
-  main{max-width:1180px;margin:0 auto;padding:24px 20px 60px}
-  .drop{border:2px dashed #c9ced9;border-radius:16px;background:#f8f9fb;padding:34px 20px;text-align:center;cursor:pointer;transition:.15s}
-  .drop:hover,.drop.over{border-color:var(--blue);background:#eef4fc}
-  .drop .ic{width:60px;height:60px;border-radius:50%;background:var(--blue-soft);display:grid;place-items:center;margin:0 auto 12px}
-  .drop b{display:block;font-size:18px}.drop span{color:var(--muted);font-size:14px}
-  .compact .drop{padding:18px}.compact .drop .ic{width:40px;height:40px;margin-bottom:6px}.compact .drop b{font-size:15px}
-  .chips{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}
-  .chip{border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:14px;color:var(--muted);background:#fff}
-  .chip.b{background:var(--blue-soft);border-color:transparent;color:#1f4c93;font-weight:600}
-  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 14px}
-  .tab{border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 13px;font:inherit;font-size:14px;cursor:pointer;color:var(--muted)}
-  .tab.on{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:600}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
-  table{width:100%;border-collapse:collapse;font-size:15px}
-  th{background:#f3f4f7;text-align:left;font-weight:600;padding:12px 14px;border-bottom:1px solid var(--line);font-size:14px;vertical-align:bottom}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.4;-webkit-font-smoothing:antialiased}
+  :focus-visible{outline:3px solid var(--soft-ink);outline-offset:2px}
+  header{background:var(--surface);border-bottom:1px solid var(--line);padding:16px 24px;display:flex;gap:16px;align-items:center}
+  .logo{width:58px;height:auto;aspect-ratio:56.4/37.21;color:var(--logo);flex:none}
+  h1{margin:0;font-size:23px;font-weight:600;letter-spacing:-.01em;line-height:1.2}
+  header p{margin:3px 0 0;color:var(--muted);font-size:15px}
+  main{max-width:1180px;margin:0 auto;padding:24px 20px 56px}
+  .drop{border:2px dashed var(--drop-edge);border-radius:var(--rs);background:var(--surface);padding:34px 20px;text-align:center;cursor:pointer;min-height:44px}
+  .drop:hover,.drop.over{background:var(--soft)}
+  .drop .ic{width:56px;height:56px;border-radius:50%;background:var(--soft);color:var(--teal);display:grid;place-items:center;margin:0 auto 12px}
+  .drop b{display:block;font-size:18px;font-weight:600}.drop span{color:var(--muted);font-size:15px}
+  .compact .drop{padding:12px 16px}.compact .drop .ic{width:36px;height:36px;margin-bottom:4px}.compact .drop .ic svg{width:20px;height:20px}.compact .drop b{font-size:16px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}
+  .chip{border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:14px;color:var(--muted);background:var(--surface)}
+  .chip b{font-weight:700;color:var(--ink)}
+  .chip.b{background:var(--soft);border-color:transparent;color:var(--soft-ink)}.chip.b b{color:var(--soft-ink)}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 14px}
+  .tab{min-height:44px;border:1px solid var(--edge);background:var(--surface);border-radius:var(--r);padding:8px 14px;font:inherit;font-size:15px;color:var(--ink);cursor:pointer;text-align:left}
+  .tab:hover{background:var(--bg)}
+  .tab.on{background:var(--teal);border-color:var(--teal);color:var(--on-teal);font-weight:600}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--rs);overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:15px;font-variant-numeric:tabular-nums}
+  th{background:var(--bg);color:var(--soft-ink);text-align:left;font-weight:600;padding:12px 14px;border-bottom:1px solid var(--line);font-size:13px;vertical-align:bottom}
   td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
   tr:last-child td{border-bottom:0}
-  .num{text-align:center}.pts{color:var(--blue);font-weight:700;font-size:17px}
-  .medal{width:34px;height:34px;border-radius:50%;display:inline-grid;place-items:center;font-weight:700;font-size:14px;color:#555}
-  .m2{background:var(--silver-soft)}
-  .m1{background:var(--gold-soft);color:#b27a00}.m3{background:var(--bronze-soft);color:#9a5b2b}
-  .tag{display:inline-block;background:#e9f0fb;color:#1f4c93;border-radius:7px;padding:3px 9px;margin:2px 6px 2px 0;font:600 13px ui-monospace,SFMono-Regular,Menlo,monospace}
+  td:first-child,th:first-child{border-left:4px solid transparent}
+  td b{font-weight:600}
+  tr.r1{background:var(--g1-bg)}tr.r1 td:first-child{border-left-color:var(--g1-bar)}tr.r1 td b{font-size:17px}
+  tr.r2{background:var(--s2-bg)}
+  tr.r3{background:var(--b3-bg)}
+  .num{text-align:center}.pts{color:var(--teal);font-weight:700;font-size:21px}
+  .medal{width:32px;height:32px;border-radius:50%;display:inline-grid;place-items:center;font-weight:600;font-size:14px;border:2px solid transparent;color:var(--ink)}
+  .p1,.p2,.p3{background:#fff;font-weight:700}
+  .p1{border-color:var(--g1);color:var(--g1)}.p2{border-color:var(--s2);color:var(--s2)}.p3{border-color:var(--b3);color:var(--b3)}
+  .tag{display:inline-block;background:var(--soft);color:var(--soft-ink);border-radius:7px;padding:3px 9px;margin:2px 6px 2px 0;font-size:13px;font-weight:500}
+  td.hide-s .tag{background:var(--surface);border:1px solid var(--line);color:var(--ink)}
   .muted{color:var(--muted)}
-  .warn{background:var(--warn);border:1px solid var(--warn-line);border-radius:12px;padding:12px 16px;margin:14px 0;font-size:14px}
+  .warn{background:var(--warn);border:1px solid var(--warn-line);border-radius:var(--rs);padding:12px 16px;margin:14px 0;font-size:14px}
   .warn ul{margin:6px 0 0;padding-left:20px}
-  .err{background:#fdecec;border-color:#f2b8b8}
-  .bar{display:flex;gap:10px;align-items:center;justify-content:flex-end;margin:0 0 12px;flex-wrap:wrap}
-  .bar input{border:1px solid var(--line);border-radius:9px;padding:8px 12px;font:inherit;font-size:14px;min-width:260px}
-  .btn{border:0;background:var(--blue);color:#fff;border-radius:9px;padding:9px 16px;font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+  .warn summary{cursor:pointer;min-height:24px}
+  .err{background:var(--err);border-color:var(--err-line)}
+  .bar{display:flex;gap:10px;align-items:center;justify-content:flex-end;margin:0 0 6px;flex-wrap:wrap}
+  .bar input{border:1px solid var(--edge);background:var(--surface);color:var(--ink);border-radius:var(--r);padding:8px 12px;min-height:44px;font:inherit;font-size:15px;min-width:260px}
+  .btn{min-height:44px;border:1px solid var(--teal);background:var(--teal);color:var(--on-teal);border-radius:var(--r);padding:8px 16px;font:inherit;font-size:15px;font-weight:600;cursor:pointer}
+  .btn.prn{background:var(--surface);color:var(--ink);border-color:var(--edge)}
+  .btn:hover{filter:brightness(.94)}
+  .pubhint{color:var(--muted);font-size:13px;text-align:right;margin:0 0 14px}
   .hint{color:var(--muted);font-size:13px;margin-top:14px}
-  .sig,.ptitle{display:none}
-  @media (max-width:720px){header{padding:14px 16px}td,th{padding:9px 8px;font-size:13px}.hide-s{display:none}}
+  .phead,.sig{display:none}
+  @media (max-width:720px){
+    header{padding:14px 16px;gap:12px}h1{font-size:22px}.logo{width:48px}
+    main{padding:16px 12px 48px}
+    td,th{padding:9px 8px}td{font-size:14px}.pts{font-size:19px}.hide-s{display:none}td.num{white-space:nowrap}.tag{white-space:nowrap}
+    .bar input{min-width:0;flex:1 1 100%}.bar .btn{flex:1 1 auto}.pubhint{text-align:left}
+  }
   @page{size:A4 landscape;margin:12mm}
   @media print{
-    body{background:#fff}header,.drop,.chips,.tabs,.bar,.warn,.hint{display:none!important}
-    main{padding:0;max-width:none}.card{border:0;border-radius:0}
-    .ptitle{display:block;font-size:18px;font-weight:700;margin:0 0 10px}
-    th{background:#fff;border-bottom:1.5px solid #000;padding:5px 6px;font-size:11px}
-    td{padding:3px 6px;font-size:11px;border-bottom:1px solid #ddd}
-    .medal{background:none!important;width:auto;height:auto;border-radius:0;color:#000!important;display:inline}
-    .tag{background:none;color:#000;padding:0 6px 0 0;font:11px Inter,system-ui,sans-serif}
-    .pts{color:#000;font-size:11px}
+    header,.drop,.chips,.tabs,.bar,.pubhint,.warn,.hint{display:none!important}
+    main{padding:0;max-width:none}
+    .phead{display:flex;align-items:center;gap:14px;margin:0 0 10px}
+    .plogo{width:56px;height:auto;aspect-ratio:56.4/37.21;color:var(--logo);flex:none}
+    .ptitle{font-size:18px;font-weight:700}
+    .card{border:0;border-radius:0;overflow:visible}
+    table{font-size:11px}
+    th{padding:5px 6px;font-size:11px}
+    td{padding:3px 6px;font-size:11px}
+    .hide-s{display:table-cell!important}
+    td.num,td{white-space:normal}
+    .pts{font-size:13px}
+    tr.r1 td b{font-size:12px}
+    .medal{width:24px;height:24px;font-size:11px;border-width:1.5px}
+    .tag{padding:1px 6px;margin:1px 4px 1px 0;font-size:11px}
     thead{display:table-header-group}tr{break-inside:avoid}
-    .sig{display:block;text-align:right;margin-top:18px;font-size:11px}
+    .sig{display:block;text-align:right;margin-top:16px;font-size:11px}
+    /* publikacja: kolory marki, wymuszone drukiem tła */
+    body[data-export="pub"],body[data-export="pub"] *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    body[data-export="pub"]{background:var(--bg)}
+    body[data-export="pub"] .ptitle{color:var(--soft-ink)}
+    body[data-export="pub"] th{background:var(--soft);border-bottom:1px solid var(--teal)}
+    body[data-export="pub"] td{border-bottom-color:hsl(188 30% 84%)}
+    /* druk (domyślny też dla Ctrl+P): bez wypełnień, obrazów tła, cieni i kolorów */
+    body:not([data-export="pub"]),body:not([data-export="pub"]) *{background:none!important;background-image:none!important;box-shadow:none!important;text-shadow:none!important;filter:none!important;color:#000!important}
+    body:not([data-export="pub"]) th{border-bottom:1.5px solid #000}
+    body:not([data-export="pub"]) td{border-bottom:1px solid #bbb}
+    body:not([data-export="pub"]) td:first-child,body:not([data-export="pub"]) th:first-child{border-left-color:transparent!important}
+    body:not([data-export="pub"]) td b{font-weight:400}
+    body:not([data-export="pub"]) tr.r1 td b,body:not([data-export="pub"]) tr.r2 td b,body:not([data-export="pub"]) tr.r3 td b{font-weight:700}
+    body:not([data-export="pub"]) .medal{border-color:transparent!important;font-weight:400}
+    body:not([data-export="pub"]) .p1,body:not([data-export="pub"]) .p2,body:not([data-export="pub"]) .p3{font-weight:700}
+    body:not([data-export="pub"]) .tag{border:0!important}
+    body:not([data-export="pub"]) .pts{font-weight:700}
   }
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><symbol id="logo-mark" viewBox="3.8 5.49 56.4 37.21"><path fill="currentColor" d="M29.5 9.8C25 6.2 14 4.6 7.5 6.5C5.17 7.17 4 8.67 4 11L4 36.5C4 38.83 5.17 39.67 7.5 39C14 37.2 25 38.6 29.5 42.5L29.5 27.89C27.56 27.02 25.84 26.1 24.2 25.4L13.5 30.8C17.5 26.27 17.5 21.73 13.5 17.2L24.2 22.6C25.84 21.9 27.56 20.98 29.5 20.11L29.5 9.8ZM34.5 9.8C39 6.2 50 4.6 56.5 6.5C58.83 7.17 60 8.67 60 11L60 36.5C60 38.83 58.83 39.67 56.5 39C50 37.2 39 38.6 34.5 42.5L34 29.6C34 29.6 34 29.6 34 29.6C43.5 32.4 52.6 28.4 53 24C52.6 19.6 43.5 15.6 34 18.4C34 18.4 34 18.4 34 18.4L34.5 9.8Z"/></symbol></svg>
 <header>
-  <div class="logo"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 12c3-4.5 8-5.5 12-3.5-1.2 1-1.7 2.2-1.7 3.5s.5 2.5 1.7 3.5c-4 2-9 1-12-3.5Z"/><path d="M6.5 12 2.5 8.5v7L6.5 12Z"/><circle cx="14" cy="11" r=".6" fill="#fff"/></svg></div>
+  <svg class="logo" viewBox="3.8 5.49 56.4 37.21" role="img" aria-label="Dziennik Wędkarza"><use href="#logo-mark"/></svg>
   <div><h1>Klasyfikacja Zawodów Wędkarskich</h1><p>Ranking na podstawie 2 najlepszych tur · system sektorowy</p></div>
 </header>
 <main id="app">
-  <div class="drop" id="drop" tabindex="0">
-    <div class="ic"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2f6fd0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5M4 15v4h16v-4"/></svg></div>
+  <div class="drop" id="drop" tabindex="0" role="button">
+    <div class="ic"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M4 15v4h16v-4"/></svg></div>
     <b>Przeciągnij plik .xlsx lub kliknij</b><span>Plik Excel z wynikami zawodów – każda tura w osobnym arkuszu</span>
     <input id="file" type="file" accept=".xlsx,.xls" hidden>
   </div>
