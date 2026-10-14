@@ -1,6 +1,6 @@
 // Numer wersji w adresach (?v=) omija cache przeglądarki po wdrożeniu; zwiększ go razem z index.html przy zmianie plików w src/.
-import { computeRound, computeFinal } from './logic.js?v=3';
-import { parseSheet, detectUnit, toGrams } from './parse.js?v=3';
+import { computeRound, computeFinal } from './logic.js?v=4';
+import { parseSheet, detectUnit, toGrams } from './parse.js?v=4';
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -38,9 +38,9 @@ function buildModel(view, rounds, fin) {
   if (view === 'final') {
     return {
       cols: [
-        { h: '#', th: 'num', kind: 'place', w: 16 },
-        { h: 'Zawodnik', th: '', kind: 'name', w: 62 },
-        { h: 'Punkty z dwóch najlepszych tur', th: 'num', kind: 'pts', w: 34 },
+        { h: '#', th: 'num', kind: 'place', w: 16, wh: 'Miejsce', ww: 38, wo: 0 },
+        { h: 'Zawodnik', th: '', kind: 'name', w: 62, wh: 'Zawodnik', ww: 165, wo: 1 },
+        { h: 'Punkty z dwóch najlepszych tur', th: 'num', kind: 'pts', w: 34, wh: 'Punkty', ww: 70, wo: 2 },
         { h: 'Tury', th: 'num hide-s', kind: 'text', w: 14 },
         { h: 'Najlepsze 2 tury', th: '', kind: 'tags', w: 84 },
         { h: 'Najlepsze 2 tury (waga)', th: 'hide-s', kind: 'tags', tag: 'weight', w: 63 },
@@ -55,12 +55,12 @@ function buildModel(view, rounds, fin) {
   return {
     cols: [
       { h: 'Lp.', th: 'num', kind: 'index', w: 16 },
-      { h: 'Nazwisko Imię', th: '', kind: 'name', w: 90 },
-      { h: 'Sek.', th: 'num', kind: 'text', w: 22 },
+      { h: 'Nazwisko Imię', th: '', kind: 'name', w: 90, wh: 'Nazwisko Imię', ww: 130, wo: 1 },
+      { h: 'Sek.', th: 'num', kind: 'text', w: 22, wh: 'Sektor', ww: 25, wo: 2 },
       { h: 'Stan.', th: 'num', kind: 'text', w: 22 },
-      { h: 'Waga', th: 'num', kind: 'text', w: 38 },
-      { h: 'Pkt', th: 'num', kind: 'pts', w: 30 },
-      { h: 'Miejsce', th: 'num', kind: 'place', w: 55 },
+      { h: 'Waga', th: 'num', kind: 'text', w: 38, wh: 'Waga', ww: 42, wo: 3 },
+      { h: 'Pkt', th: 'num', kind: 'pts', w: 30, wh: 'Punkty', ww: 40, wo: 4 },
+      { h: 'Miejsce', th: 'num', kind: 'place', w: 55, wh: 'Miejsce', ww: 36, wo: 0 },
     ],
     rows: rd.rows.map((r, i) => ({
       place: r.place,
@@ -106,8 +106,8 @@ function render() {
     </div>
     ${warns.length ? `<div class="warn"><b>Do sprawdzenia:</b><ul>${warns.map((w) => `<li>${esc(w)}</li>`).join('')}</ul></div>` : ''}
     <div class="tabs">${tabs.map(([k, l]) => `<button class="tab ${k === view ? 'on' : ''}" data-k="${esc(k)}"${k === view ? ' aria-current="true"' : ''}>${esc(l)}</button>`).join('')}</div>
-    <div class="bar"><input id="title" placeholder="Tytuł do PDF, np. Puchar Okręgu – 12.05 Częstochowa" value="${esc(state.title)}"><button class="btn" id="pdf-pub">PDF do publikacji</button><button class="btn prn" id="pdf-print">PDF do druku</button></div>
-    <p class="pubhint">Przyciski pobierają plik PDF. Jeśli się nie uda, otworzy się okno wydruku („Zapisz jako PDF”).</p>
+    <div class="bar"><input id="title" placeholder="Tytuł do PDF, np. Puchar Okręgu – 12.05 Częstochowa" value="${esc(state.title)}"><button class="btn" id="pdf-pub">PDF do publikacji</button><button class="btn prn" id="pdf-print">PDF do druku</button><button class="btn prn" id="pdf-wall">PDF do wywieszenia</button></div>
+    <p class="pubhint">Przyciski pobierają plik PDF. „Do wywieszenia”: bardzo duże litery, tylko miejsce, nazwisko i punkty. Jeśli pobieranie się nie uda, otworzy się okno wydruku („Zapisz jako PDF”).</p>
     <p class="status" id="pdf-status" role="status" aria-live="polite"></p>
     <div class="phead"><svg class="plogo" viewBox="3.8 5.49 56.4 37.21" aria-hidden="true"><use href="#logo-mark"/></svg><div class="ptitle" id="ptitle"></div></div>
     ${body}
@@ -118,6 +118,7 @@ function render() {
   t.addEventListener('input', () => (state.title = t.value));
   $('#pdf-pub').addEventListener('click', () => exportPdf('pub'));
   $('#pdf-print').addEventListener('click', () => exportPdf('print'));
+  $('#pdf-wall').addEventListener('click', () => exportPdf('wall'));
 }
 
 // Tytuł dokumentu zależy od wybranego rankingu i pola tytułu (PDF, wydruk, zwykłe Ctrl+P).
@@ -136,8 +137,8 @@ const loadScript = (src) => new Promise((ok, fail) => {
 });
 let pdfModule;
 const loadPdf = () => (pdfModule ??= (async () => {
-  if (!window.jspdf) await loadScript('vendor/jspdf.umd.min.js?v=3');
-  return import('./pdf.js?v=3');
+  if (!window.jspdf) await loadScript('vendor/jspdf.umd.min.js?v=4');
+  return import('./pdf.js?v=4');
 })().catch((e) => { pdfModule = undefined; throw e; }));
 
 const setStatus = (msg) => { const el = $('#pdf-status'); if (el) el.textContent = msg; };
@@ -145,7 +146,7 @@ const setStatus = (msg) => { const el = $('#pdf-status'); if (el) el.textContent
 // Pobiera plik PDF. Gdy generowanie się nie powiedzie (np. brak sieci przy pierwszym użyciu),
 // otwiera okno wydruku z tym samym wariantem stylów.
 async function exportPdf(mode) {
-  const btns = [...document.querySelectorAll('#pdf-pub, #pdf-print')];
+  const btns = [...document.querySelectorAll('#pdf-pub, #pdf-print, #pdf-wall')];
   btns.forEach((b) => (b.disabled = true));
   setStatus('Przygotowuję plik PDF…');
   try {
@@ -155,7 +156,7 @@ async function exportPdf(mode) {
   } catch (e) {
     console.error(e);
     setStatus(`Nie udało się przygotować pliku PDF. Otwieram okno wydruku – wybierz „Zapisz jako PDF”${mode === 'pub' ? ' i zaznacz „Grafika w tle”' : ''}.`);
-    printFallback(mode);
+    printFallback(mode === 'wall' ? 'print' : mode);
   } finally {
     btns.forEach((b) => (b.disabled = false));
   }
