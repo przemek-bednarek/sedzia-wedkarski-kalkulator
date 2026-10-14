@@ -33,6 +33,7 @@ async function load(file) {
 }
 
 // Jeden model tabeli zasila widok HTML i generator PDF (src/pdf.js), żeby oba pokazywały te same dane.
+// Kolumny z wh/ww/wo wchodzą do PDF do druku (duży format): wh = nagłówek, ww = szerokość, wo = kolejność.
 // Komórki: place -> liczba, tags -> tablica tekstów, pozostałe -> tekst.
 function buildModel(view, rounds, fin) {
   if (view === 'final') {
@@ -106,8 +107,8 @@ function render() {
     </div>
     ${warns.length ? `<div class="warn"><b>Do sprawdzenia:</b><ul>${warns.map((w) => `<li>${esc(w)}</li>`).join('')}</ul></div>` : ''}
     <div class="tabs">${tabs.map(([k, l]) => `<button class="tab ${k === view ? 'on' : ''}" data-k="${esc(k)}"${k === view ? ' aria-current="true"' : ''}>${esc(l)}</button>`).join('')}</div>
-    <div class="bar"><input id="title" placeholder="Tytuł do PDF, np. Puchar Okręgu – 12.05 Częstochowa" value="${esc(state.title)}"><button class="btn" id="pdf-pub">PDF do publikacji</button><button class="btn prn" id="pdf-print">PDF do druku</button><button class="btn prn" id="pdf-wall">PDF do wywieszenia</button></div>
-    <p class="pubhint">Przyciski pobierają plik PDF. „Do wywieszenia”: bardzo duże litery, tylko miejsce, nazwisko i punkty. Jeśli pobieranie się nie uda, otworzy się okno wydruku („Zapisz jako PDF”).</p>
+    <div class="bar"><input id="title" placeholder="Tytuł do PDF, np. Puchar Okręgu – 12.05 Częstochowa" value="${esc(state.title)}"><button class="btn" id="pdf-pub">PDF do publikacji</button><button class="btn prn" id="pdf-print">PDF do druku</button></div>
+    <p class="pubhint">Przyciski pobierają plik PDF. „Do druku”: bardzo duże litery, tylko miejsce, nazwisko i punkty. Jeśli pobieranie się nie uda, otworzy się okno wydruku („Zapisz jako PDF”).</p>
     <p class="status" id="pdf-status" role="status" aria-live="polite"></p>
     <div class="phead"><svg class="plogo" viewBox="3.8 5.49 56.4 37.21" aria-hidden="true"><use href="#logo-mark"/></svg><div class="ptitle" id="ptitle"></div></div>
     ${body}
@@ -118,7 +119,6 @@ function render() {
   t.addEventListener('input', () => (state.title = t.value));
   $('#pdf-pub').addEventListener('click', () => exportPdf('pub'));
   $('#pdf-print').addEventListener('click', () => exportPdf('print'));
-  $('#pdf-wall').addEventListener('click', () => exportPdf('wall'));
 }
 
 // Tytuł dokumentu zależy od wybranego rankingu i pola tytułu (PDF, wydruk, zwykłe Ctrl+P).
@@ -146,7 +146,7 @@ const setStatus = (msg) => { const el = $('#pdf-status'); if (el) el.textContent
 // Pobiera plik PDF. Gdy generowanie się nie powiedzie (np. brak sieci przy pierwszym użyciu),
 // otwiera okno wydruku z tym samym wariantem stylów.
 async function exportPdf(mode) {
-  const btns = [...document.querySelectorAll('#pdf-pub, #pdf-print, #pdf-wall')];
+  const btns = [...document.querySelectorAll('#pdf-pub, #pdf-print')];
   btns.forEach((b) => (b.disabled = true));
   setStatus('Przygotowuję plik PDF…');
   try {
@@ -156,7 +156,7 @@ async function exportPdf(mode) {
   } catch (e) {
     console.error(e);
     setStatus(`Nie udało się przygotować pliku PDF. Otwieram okno wydruku – wybierz „Zapisz jako PDF”${mode === 'pub' ? ' i zaznacz „Grafika w tle”' : ''}.`);
-    printFallback(mode === 'wall' ? 'print' : mode);
+    printFallback(mode);
   } finally {
     btns.forEach((b) => (b.disabled = false));
   }

@@ -1,7 +1,7 @@
 // Generator pliku PDF (jsPDF ładowany osobno, patrz app.js). Dostaje gotowy model tabeli z app.js,
 // więc dane, kolejność, formatowanie i miejsca są te same co na ekranie.
-// Warianty: 'pub' – kolory marki; 'print' – bez wypełnień, czarno-biały; 'wall' – do wywieszenia na tablicy:
-// jak 'print', ale tylko miejsce, nazwisko i punkty (kolumny z flagą wh/ww/wo w modelu), bardzo duże litery.
+// Warianty: 'pub' – kolory marki, pełna tabela; 'print' – do wydruku i wywieszenia, czytany z dystansu 1–3 m:
+// bez wypełnień, czarno-biały, tylko miejsce, nazwisko i punkty (kolumny z flagą wh/ww/wo w modelu), bardzo duże litery.
 
 const PW = 297, PH = 210, M = 12; // A4 poziomo, marginesy w mm
 const C = {
@@ -14,10 +14,10 @@ const MEDAL = {
   3: { bg: '#faf0e9', ink: '#865132', fill: '#c98a62' },
 };
 const MM_PT = 0.3528; // mm na punkt
-// Rozmiary w pt (tekst) i mm (odstępy). Wywieszka ma być czytelna z 1–3 m.
+// Rozmiary w pt (tekst) i mm (odstępy). Wydruk ma być czytelny z 1–3 m.
 const SIZES = {
   normal: { title: 15, logoH: 10, head: 8, headLH: 3.5, headPad: 4, name: 9, nameTop: 10, nameLH: 4, pts: 11, place: 9, text: 9, minRow: 8, rowPad: 4, cup: 5, badge: 5.6, gap: 1.6, line: 0.15, headRule: 0.4 },
-  wall: { title: 22, logoH: 13, head: 14, headLH: 6, headPad: 7, name: 20, nameTop: 22, nameLH: 8.6, pts: 24, place: 20, text: 18, minRow: 13, rowPad: 5, cup: 8.5, badge: 0, gap: 3, line: 0.3, headRule: 0.8 },
+  big: { title: 22, logoH: 13, head: 14, headLH: 6, headPad: 7, name: 20, nameTop: 22, nameLH: 8.6, pts: 24, place: 20, text: 18, minRow: 13, rowPad: 5, cup: 8.5, badge: 0, gap: 3, line: 0.3, headRule: 0.8 },
 };
 
 let fontB64;
@@ -54,8 +54,8 @@ const slug = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ł/g, 'l
 
 export async function buildPdf({ model, mode, title }) {
   const pub = mode === 'pub';
-  const wall = mode === 'wall';
-  const S = wall ? SIZES.wall : SIZES.normal;
+  const big = mode === 'print';
+  const S = big ? SIZES.big : SIZES.normal;
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4', compress: true });
   doc.addFileToVFS('Outfit-Regular.ttf', await loadFont());
@@ -81,9 +81,9 @@ export async function buildPdf({ model, mode, title }) {
       : svgToPng('#cup', C.black, { strokeW: 2, scale: 8 });
   }
 
-  // kolumny: w wywieszce tylko te z flagą ww (kolejność wo), z własnymi nagłówkami i szerokościami
-  const cols = (wall ? model.cols.map((c, i) => ({ ...c, i })).filter((c) => c.ww).sort((a, b) => a.wo - b.wo)
-    : model.cols.map((c, i) => ({ ...c, i }))).map((c) => (wall ? { ...c, h: c.wh, w: c.ww } : c));
+  // kolumny: w druku tylko te z flagą ww (kolejność wo), z własnymi nagłówkami i szerokościami
+  const cols = (big ? model.cols.map((c, i) => ({ ...c, i })).filter((c) => c.ww).sort((a, b) => a.wo - b.wo)
+    : model.cols.map((c, i) => ({ ...c, i }))).map((c) => (big ? { ...c, h: c.wh, w: c.ww } : c));
   const tableW = PW - 2 * M;
   const sumW = cols.reduce((a, c) => a + c.w, 0);
   const widths = cols.map((c) => (c.w / sumW) * tableW);
@@ -191,15 +191,15 @@ export async function buildPdf({ model, mode, title }) {
     });
     y += rowH;
     const next = model.rows[ri + 1];
-    hline(y, pub ? C.pubLine : wall ? '#555555' : C.printLine, S.line);
-    if (wall && top3 && !(next && next.place >= 1 && next.place <= 3)) hline(y, C.black, 0.9); // kreska pod podium
+    hline(y, pub ? C.pubLine : big ? '#555555' : C.printLine, S.line);
+    if (big && top3 && !(next && next.place >= 1 && next.place <= 3)) hline(y, C.black, 0.9); // kreska pod podium
   });
 
   // podpis na końcu ostatniej strony
   if (y + 9 > bottom) { doc.addPage(); pageBg(); y = M; }
-  text('Opracował Bednarek Sławomir', PW - M, y + 7, { size: wall ? 12 : 9, align: 'right', color: pub ? C.muted : C.black });
+  text('Opracował Bednarek Sławomir', PW - M, y + 7, { size: big ? 12 : 9, align: 'right', color: pub ? C.muted : C.black });
 
-  const name = `${slug(title)}_${pub ? 'do-publikacji' : wall ? 'do-wywieszenia' : 'do-druku'}.pdf`;
+  const name = `${slug(title)}_${pub ? 'do-publikacji' : 'do-druku'}.pdf`;
   doc.save(name);
   return name;
 }
