@@ -2,7 +2,7 @@
 
 Aplikacja dla sędziego: wgrywasz plik Excel (każda tura w osobnym arkuszu), dostajesz ranking tur i ranking końcowy z 2 najlepszych tur, z eksportem do PDF.
 Wszystko liczy się w przeglądarce – bez serwera, bez logowania, bez zapisu danych.
-Eksport: dwa przyciski pobierają plik PDF – „PDF do publikacji” (kolorowy) i „PDF do druku” (bez wypełnień). Gdy generowanie się nie uda (np. brak sieci przy pierwszym użyciu), otwiera się okno wydruku z tym samym wariantem; zwykłe Ctrl+P też daje wariant do druku. Biblioteka PDF i font ładują się dopiero przy pierwszym eksporcie.
+Eksport: dwa przyciski pobierają plik PDF – „PDF do publikacji” (kolorowy, pełna tabela) i „PDF do druku” (czarno-biały, bez wypełnień, bardzo duże litery, tylko miejsce, nazwisko i punkty; do wydruku i wywieszenia, czytany z 1–3 m). Gdy generowanie się nie uda (np. brak sieci przy pierwszym użyciu), otwiera się okno wydruku z tym samym wariantem; zwykłe Ctrl+P też daje wariant do druku. Biblioteka PDF i font ładują się dopiero przy pierwszym eksporcie.
 
 ## Reguły (wersja bieżąca)
 - Sektor czytany z pliku, nigdy liczony ze stanowiska. Brak sztywnego limitu osób w sektorze.
